@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What time is it now?</title>
+  <style>
+    :root {
+      --main-bg-color: #fff;
+      --main-text-color: #888888;
+    }
+
+    [data-theme="dark"] {
+      --main-bg-color: #1e1f26;
+      --main-text-color: #ccc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+      background-color: var(--main-bg-color);
+      position: relative;
+      transition: all ease 0.2s;
+    }
+
+    #page-header {
+      font-size: 2rem;
+      color: var(--main-text-color);
+      padding: 2rem 0;
+      font-family: monospace;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      transition: all ease 0.2s;
+    }
+
+    #clock {
+      min-height: 18em;
+      min-width: 18em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--main-bg-color);
+      border-radius: 50%;
+      border: 4px solid var(--main-bg-color);
+      box-shadow: 0 -15px 15px rgba(255, 255, 255, 0.05),
+        inset 0 -15px 15px rgba(255, 255, 255, 0.05), 0 15px 15px rgba(0, 0, 0, 0.3),
+        inset 0 15px 15px rgba(0, 0, 0, 0.3);
+      position: relative;
+      transition: all ease 0.2s;
+    }
+
+    #clock:before {
+      content: "";
+      height: 0.75rem;
+      width: 0.75rem;
+      background-color: var(--main-text-color);
+      border: 2px solid var(--main-bg-color);
+      position: absolute;
+      border-radius: 50%;
+      z-index: 1000;
+      transition: all ease 0.2s;
+    }
+
+    #hour,
+    #minute,
+    #second {
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    #hour {
+      height: 10em;
+      width: 10em;
+    }
+
+    #hour:before {
+      content: "";
+      position: absolute;
+      height: 50%;
+      width: 6px;
+      background-color: var(--main-text-color);
+      border-radius: 6px;
+    }
+
+    #minute {
+      height: 12em;
+      width: 12em;
+    }
+
+    #minute:before {
+      content: "";
+      height: 50%;
+      width: 4px;
+      background-color: var(--main-text-color);
+      border-radius: 4px;
+    }
+
+    #second {
+      height: 13em;
+      width: 13em;
+    }
+
+    #second:before {
+      content: "";
+      height: 60%;
+      width: 2px;
+      background-color: #f00;
+      border-radius: 2px;
+    }
+
+    #text {
+      font-family: monospace;
+      font-size: 1.5rem;
+      color: var(--main-text-color);
+      margin-top: 4rem;
+    }
+
+    .switch-cont {
+      margin: 1em auto;
+    }
+
+    .switch-cont .switch-btn {
+      font-family: monospace;
+      text-transform: uppercase;
+      outline: none;
+      padding: 0.5rem 1rem;
+      background-color: var(--main-bg-color);
+      color: var(--main-text-color);
+      border: 1px solid var(--main-text-color);
+      border-radius: 0.25rem;
+      cursor: pointer;
+      transition: all ease 0.3s;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="page-header">What time is it now?</div>
+  <div id="clock">
+    <div id="hour"></div>
+    <div id="minute"></div>
+    <div id="second"></div>
+  </div>
+  <p id="text">00:00:00</p>
+  <div class="switch-cont">
+    <button class="switch-btn">Light</button>
+  </div>
+
+  <script>
+    const elHour = document.getElementById("hour");
+    const elMinute = document.getElementById("minute");
+    const elSecond = document.getElementById("second");
+    const elText = document.getElementById("text");
+
+    const clock = () => {
+      const date = new Date();
+      const h = date.getHours() % 12; // 小時範圍為 0-11
+      const m = date.getMinutes();
+      const s = date.getSeconds();
+
+      // 計算角度 (從 12 點鐘開始)
+      const hourAngle = h * 30 + m * 0.5;
+      const minuteAngle = m * 6 + s * 0.1;
+      const secondAngle = s * 6;
+
+      // 套用角度至指針
+      elHour.style.transform = `rotate(${hourAngle}deg)`;
+      elMinute.style.transform = `rotate(${minuteAngle}deg)`;
+      elSecond.style.transform = `rotate(${secondAngle}deg)`;
+
+      // 更新時間顯示
+      elText.innerText = `${h.toString().padStart(2, "0")}:${m
+        .toString()
+        .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+    };
+
+    // 每秒更新一次
+    setInterval(clock, 1000);
+    clock();
+
+    const switchTheme = (evt) => {
+      const switchBtn = evt.target;
+      if (switchBtn.textContent.toLowerCase() === "light") {
+        switchBtn.textContent = "Dark";
+        document.documentElement.setAttribute("data-theme", "dark");
+      } else {
+        switchBtn.textContent = "Light";
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    };
+
+    const switchModeBtn = document.querySelector(".switch-btn");
+    switchModeBtn.addEventListener("click", switchTheme, false);
+
+    // 預設主題設定
+    let currentTheme = "dark";
+    if (currentTheme) {
+      document.documentElement.setAttribute("data-theme", currentTheme);
+      switchModeBtn.textContent =
+        currentTheme.charAt(0).toUpperCase() + currentTheme.slice(1);
+    }
+  </script>
+</body>
+
+</html>
